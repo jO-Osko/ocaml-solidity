@@ -33,6 +33,7 @@ and module_ =
 and module_units = source_unit node list
 
 and source_unit =
+  | License of string
   | Pragma of (Ident.t * string)
   | Import of import_directive
   | GlobalTypeDefinition of type_definition
@@ -181,6 +182,8 @@ and raw_statement =
       (type_ * storage_location option * ident) option list
       * expression
       * statement (* freeton *)
+  | InlineAssembly of string
+(* dummy placeholder for assembler *)
 
 and expression = raw_expression node
 

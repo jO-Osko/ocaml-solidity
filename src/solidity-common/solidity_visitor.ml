@@ -517,6 +517,7 @@ and visitStatement (v : #ast_visitor) (s : statement) : unit =
         v var_decl_list;
       visitExpression v e;
       visitStatement v s2
+    | InlineAssembly _ -> ()
   in
   handleAction v#visitStatement continueVisit s
 
@@ -615,6 +616,7 @@ and visitSourceUnit (v : #ast_visitor) (su : source_unit) : unit =
     | GlobalFunctionDefinition fd -> visitFunctionDef v fd
     | GlobalVariableDefinition vd -> visitStateVariableDef v vd
     | ContractDefinition cdn -> visitContractDef v cdn
+    | License s -> visitString v s
   in
   handleAction v#visitSourceUnit continueVisit su
 

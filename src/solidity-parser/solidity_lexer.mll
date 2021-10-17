@@ -79,6 +79,9 @@ let space =
 let identifier =
   ['a'-'z' 'A'-'Z' '_' '$'] ['a'-'z' 'A'-'Z' '_' '$' '0'-'9']*
 
+let license_identifier = 
+  ['a'-'z' 'A'-'Z' '_' '$'] ['a'-'z' 'A'-'Z' '_' '$' '0'-'9' '-']*
+
 let hex_digit =
   ['0'-'9' 'a'-'f' 'A'-'F' '_']
 
@@ -98,9 +101,9 @@ let dec_80 =
   '0'* (['1'-'7']? ['0'-'9'] | "80")
 
 rule token = parse
-  | eol_comment { token lexbuf }
   | space+      { token lexbuf }
-  | newline     { newline lexbuf; token lexbuf }
+  | "//"       { parse_comment lexbuf }
+  | newline_char     { newline lexbuf; token lexbuf }
   | "#" [' ' '\t']* (['0'-'9']+ as num) [' ' '\t']*
         ("\"" ([^ '\010' '\013' '"' ] * as name) "\"")?
         [^ '\010' '\013'] * newline
@@ -156,6 +159,8 @@ rule token = parse
   | "{"   { LBRACE }
   | "}"   { RBRACE }
   | ","   { COMMA }
+  | "assembler" { ASSEMBLY }
+  | ":=" { ASSEMBLY_ASSIGN }
 
   | ((['0'-'9']+ as i) ('.' (['0'-'9']+ as d))?
                      | ('.' (['0'-'9']+ as d)))
@@ -204,6 +209,27 @@ rule token = parse
 
   | _
       { error lexbuf "Unrecognized lexeme: \"%s\"" (Lexing.lexeme lexbuf) }
+
+and parse_comment = parse
+  | "SPDX-License-Identifier:" { begin_license lexbuf }
+  | space+      { parse_comment lexbuf }
+  | _           { parse_rest_of_comment lexbuf }
+  | eof         { EOF }
+
+and parse_rest_of_comment = parse
+  | newline_char           { newline lexbuf; token lexbuf }
+  | eof                    { EOF }
+  | _                      { parse_rest_of_comment lexbuf }
+
+and begin_license = parse
+  | space+     { begin_license lexbuf }
+  | license_identifier {  
+                         let l = LICENSE (Lexing.lexeme lexbuf) in 
+                         end_license lexbuf; 
+                         l }
+
+and end_license = parse
+  | newline_char      { newline lexbuf }
 
 and multiline_comment = parse
   | "*/"         { () }
@@ -312,6 +338,7 @@ let init ~freeton =
           "days", NUMBERUNIT (Days);
           "weeks", NUMBERUNIT (Weeks);
           "years", NUMBERUNIT (Years);
+          "assembly", ASSEMBLY;
         ];
 if freeton then
     List.iter (fun (kwd, token) ->

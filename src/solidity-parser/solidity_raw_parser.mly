@@ -250,6 +250,7 @@
 
 (* Keywords *)
 %token <Solidity_common.Ident.t * string> PRAGMA
+%token <string> LICENSE
 %token IMPORT
 %token AS
 %token FROM
@@ -314,6 +315,7 @@
 %token DO
 %token TRY
 %token CATCH
+%token ASSEMBLY
 
 (* Punctuation *)
 %token SEMI
@@ -362,6 +364,7 @@
 %token QUESTION
 %token COLON
 %token EQUALGREATER
+%token ASSEMBLY_ASSIGN
 
 (* Literals *)
 %token <bool> BOOLEANLITERAL
@@ -438,6 +441,7 @@ module_units:
 
 source_unit:
   | PRAGMA                       { mk $loc (Pragma ($1)) }
+  | LICENSE                      { mk $loc (License ($1)) }
   | IMPORT import_directive SEMI { mk $loc (Import ($2)) }
   | contract_definition          { mk $loc (ContractDefinition ($1)) }
   | type_definition              { mk $loc (GlobalTypeDefinition ($1)) }
@@ -867,6 +871,7 @@ statement_no_semi:
   | repeat_statement { freeton() ; mk $loc ($1) }
   | try_statement   { mk $loc ($1) }
   | block           { mk $loc (Block ($1)) }
+  | assembler       { mk $loc ($1)}
 ;;
 
 statement_before_semi:
@@ -878,6 +883,25 @@ statement_before_semi:
   | CONTINUE           { mk $loc (Continue) }
   | BREAK              { mk $loc (Break) }
   | EMIT function_call { let (f, a) = $2 in mk $loc (Emit (f, a)) }
+;;
+
+
+// Very hacky way to get around the fact that the original parser
+// doesn't support assembly statements.
+assembler:
+  | ASSEMBLY LBRACE assembler_code RBRACE
+      { InlineAssembly "Not parsed" }
+
+;;
+
+assembler_code:
+  | IDENTIFIER ASSEMBLY_ASSIGN function_call 
+    { StringLiteral ("") }
+  | function_call 
+    { StringLiteral ("") }
+  | RETURN tuple_expression
+    { StringLiteral ("") }
+  
 ;;
 
 if_statement:

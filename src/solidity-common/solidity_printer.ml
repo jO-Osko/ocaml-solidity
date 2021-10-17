@@ -126,6 +126,8 @@ let rec bprint_contract b ~freeton indent c =
 
 and bprint_source_unit b ~freeton indent su =
   match strip su with
+  | License s ->
+    bprint b indent (Format.asprintf "// SPDX-License-Identifier: %s" s)
   | Pragma (id, s) ->
     if not freeton then
       bprint b indent (Format.asprintf "pragma %a %s;" Ident.printf id s)
@@ -527,6 +529,7 @@ and statement b indent s =
                    var_decl_list ) ) )
          (string_of_expression e) );
     statement b (indent + 2) s2
+  | InlineAssembly s -> bprint b indent (Format.sprintf "assembly { %s }" s)
 
 and string_of_expression_option = function
   | None -> ""

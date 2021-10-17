@@ -37,6 +37,7 @@ and module_units = source_unit node list
 
 (** The different kind of contents. *)
 and source_unit =
+  | License of string  (** SPDX licence declaration *)
   | Pragma of (Ident.t * string)
       (** Options for the official solidity compiler *)
   | Import of import_directive  (** Import directive *)
@@ -200,8 +201,9 @@ and raw_statement =
   | ForRangeStatement of
       (type_ * storage_location option * ident) option list
       * expression
-      * statement
-(* freeton *)
+      * statement (* freeton *)
+  | InlineAssembly of string
+(* dummy placeholder for assembler *)
 
 and expression = raw_expression node
 

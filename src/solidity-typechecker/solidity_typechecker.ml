@@ -1309,6 +1309,8 @@ let rec type_statement opt env s =
     | TEvent ed ->
       check_function_application pos "function call" ed.event_params args
     | _ -> error pos "Expression has to be an event invocation" )
+  | InlineAssembly _ -> ()
+(* Just ignore for now *)
 
 let constructor_params env lid =
   match Solidity_tenv.find_lident env ~lookup:LInternal (strip lid) with
@@ -1501,6 +1503,7 @@ let typecheck_code menv m =
           expect_expression_type opt menv e vd'.variable_type
         | None -> () (* typecheck_free_function_code unit_node.pos menv fd' *) )
       | Pragma _
+      | License _
       | Import _
       | GlobalTypeDefinition _ ->
         () )
@@ -1550,6 +1553,7 @@ let postprocess_module_contracts m =
               (LongIdent.to_string cd'.contract_abs_name)
               (Ident.to_string fid) )
       | Pragma _
+      | License _
       | Import _
       | GlobalFunctionDefinition _
       | GlobalVariableDefinition _
@@ -1912,6 +1916,7 @@ let preprocess_module_contracts menv m =
         Solidity_tenv_builder.add_inherited_definitions cd';
         preprocess_contract_definitions cd'
       | Pragma _
+      | License _
       | Import _
       | GlobalFunctionDefinition _
       | GlobalVariableDefinition _
@@ -1979,7 +1984,9 @@ let preprocess_module p menvs m =
   List.iter
     (fun unit_node ->
       match strip unit_node with
-      | Pragma _ -> ()
+      | Pragma _
+      | License _ ->
+        ()
       | Import { import_from; import_symbols; import_pos = _ } -> (
         let file = make_absolute_path base import_from in
         let im = StringMap.find file p.program_modules_by_file in
