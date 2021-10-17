@@ -9,12 +9,11 @@
 (**************************************************************************)
 
 module Hex : sig
-
   type t = string
 
   val compare : t -> t -> int
-  val equal : t -> t -> bool
 
+  val equal : t -> t -> bool
 
   (** [encode s] converts a string to a lowercase hexadecimal notation *)
   val encode : string -> t
@@ -23,7 +22,7 @@ module Hex : sig
   val encodeU : string -> t
 
   (** [decode hex] converts a string in hexadecimal notation into its
-     corresponding decoded string. Can raise Invalid_argument. *)
+      corresponding decoded string. Can raise Invalid_argument. *)
   val decode : t -> string
 
   (** [encode s] converts a string to a lowercase hexadecimal notation *)
@@ -33,7 +32,6 @@ module Hex : sig
   val encodeU_bytes : bytes -> t
 
   (** [decode hex] converts a string in hexadecimal notation into its
-     corresponding decoded string. Can raise Invalid_argument. *)
+      corresponding decoded string. Can raise Invalid_argument. *)
   val decode_bytes : t -> bytes
-
 end

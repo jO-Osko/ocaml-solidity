@@ -10,9 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(**
-  Checks that a typed solidity AST verifies the Solidity standard properties.
-  The list of exceptions this function may raise is defined in
-  Solidity_exceptions
-*)
+(** Checks that a typed solidity AST verifies the Solidity standard properties.
+    The list of exceptions this function may raise is defined in
+    Solidity_exceptions *)
 val checkProgram : Solidity_ast.program -> unit

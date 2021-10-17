@@ -9,8 +9,11 @@ SPHINX_TARGET:=_drom/docs/sphinx
 
 ODOC_TARGET:=_drom/docs/doc/.
 
+format:
+	dune build @fmt --auto-promote
+.PHONY: format
 
-all: build
+all: format build
 
 build:
 	./scripts/before.sh build

@@ -16,19 +16,21 @@ type ident = Ident.t node
 
 type longident = relative LongIdent.t node
 
-type program = {
-  program_modules : module_ list;
-  program_modules_by_id : module_ IdentMap.t;
-  program_modules_by_file : module_ StringMap.t;
-}
+type program =
+  { program_modules : module_ list;
+    program_modules_by_id : module_ IdentMap.t;
+    program_modules_by_file : module_ StringMap.t
+  }
 
-and module_ = {
-  module_file : string; (* *absolute* path *)
-  module_id : Ident.t; (* the module id: @n *)
-  module_units : module_units;
-}
+and module_ =
+  { module_file : string;
+    (* *absolute* path *)
+    module_id : Ident.t;
+    (* the module id: @n *)
+    module_units : module_units
+  }
 
-and module_units = (source_unit node) list
+and module_units = source_unit node list
 
 and source_unit =
   | Pragma of (Ident.t * string)
@@ -38,23 +40,23 @@ and source_unit =
   | GlobalVariableDefinition of state_variable_definition
   | ContractDefinition of contract_definition
 
-and import_directive = {
-  import_pos : Solidity_common.pos ;
-  import_from : string;
-  import_symbols : import_symbols;
-}
+and import_directive =
+  { import_pos : Solidity_common.pos;
+    import_from : string;
+    import_symbols : import_symbols
+  }
 
 and import_symbols =
   | ImportAll of ident option
   | ImportIdents of (ident * ident option) list
 
-and contract_definition = {
-  contract_name : ident;
-  contract_kind : contract_kind;
-  contract_abstract : bool;
-  contract_inheritance : inheritance_specifier list;
-  contract_parts : (contract_part node) list;
-}
+and contract_definition =
+  { contract_name : ident;
+    contract_kind : contract_kind;
+    contract_abstract : bool;
+    contract_inheritance : inheritance_specifier list;
+    contract_parts : contract_part node list
+  }
 
 and inheritance_specifier = longident * expression list
 
@@ -76,43 +78,52 @@ and struct_definition = ident * field_definition list
 
 and field_definition = type_ * ident
 
-and state_variable_definition = {
-  var_name : ident;
-  var_type : type_;
-  var_visibility : visibility; (* def: internal *)
-  var_mutability : var_mutability; (* def: mutable *)
-  var_override : longident list option;
-  var_init : expression option;
-  var_static : bool ; (* freeton: default is false *)
-}
+and state_variable_definition =
+  { var_name : ident;
+    var_type : type_;
+    var_visibility : visibility;
+    (* def: internal *)
+    var_mutability : var_mutability;
+    (* def: mutable *)
+    var_override : longident list option;
+    var_init : expression option;
+    var_static : bool (* freeton: default is false *)
+  }
 
-and function_definition = {
-  fun_name : ident;
-  fun_params : param list;
-  fun_returns : return list;
-  fun_modifiers : (longident * expression list option) list;
-  fun_visibility : visibility; (* def: public (external in interface) *)
-  fun_mutability : fun_mutability; (* ctor: public/forbidden ? *)
-  fun_override : longident list option; (* fallback/receive: external *)
-  fun_virtual : bool;                   (* but public if missing...  *)
-  fun_inline : bool; (* freeton *)
-  fun_responsible : bool; (* freeton *)
-  fun_body : block option;        (* mutability : nonpayable by default *)
-}
+and function_definition =
+  { fun_name : ident;
+    fun_params : param list;
+    fun_returns : return list;
+    fun_modifiers : (longident * expression list option) list;
+    fun_visibility : visibility;
+    (* def: public (external in interface) *)
+    fun_mutability : fun_mutability;
+    (* ctor: public/forbidden ? *)
+    fun_override : longident list option;
+    (* fallback/receive: external *)
+    fun_virtual : bool;
+    (* but public if missing...  *)
+    fun_inline : bool;
+    (* freeton *)
+    fun_responsible : bool;
+    (* freeton *)
+    fun_body : block option (* mutability : nonpayable by default *)
+  }
 
-and modifier_definition = {
-  mod_name : ident;
-  mod_params : param list;
-  mod_override : longident list option;
-  mod_virtual : bool;
-  mod_body : block option;
-}
+and modifier_definition =
+  { mod_name : ident;
+    mod_params : param list;
+    mod_override : longident list option;
+    mod_virtual : bool;
+    mod_body : block option
+  }
 
-and event_definition = {
-  event_name : ident;
-  event_params : (type_ * bool * ident option) list; (* indexed *)
-  event_anonymous : bool;
-}
+and event_definition =
+  { event_name : ident;
+    event_params : (type_ * bool * ident option) list;
+    (* indexed *)
+    event_anonymous : bool
+  }
 
 and param = type_ * storage_location option * ident option
 
@@ -124,7 +135,8 @@ and type_ =
   | Mapping of type_ * type_
   | FunctionType of function_type
   | UserDefinedType of longident
-  | Optional of type_ list (* freeton *)
+  | Optional of type_ list
+(* freeton *)
 
 and elementary_type =
   | TypeBool
@@ -137,12 +149,15 @@ and elementary_type =
   | TypeString
   | TypeAbstract of string
 
-and function_type = {
-  fun_type_params : param list;
-  fun_type_returns : (type_ * storage_location option) list; (* ident forbid *)
-  fun_type_visibility : visibility; (* def: internal *) (* only intern/extern *)
-  fun_type_mutability : fun_mutability; (* def: non-payable *)
-}
+and function_type =
+  { fun_type_params : param list;
+    fun_type_returns : (type_ * storage_location option) list;
+    (* ident forbid *)
+    fun_type_visibility : visibility;
+    (* only intern/extern *)
+    (* def: internal *)
+    fun_type_mutability : fun_mutability (* def: non-payable *)
+  }
 
 and statement = raw_statement node
 
@@ -153,8 +168,8 @@ and raw_statement =
   | IfStatement of expression * statement * statement option
   | WhileStatement of expression * statement
   | DoWhileStatement of statement * expression
-  | ForStatement of statement option * expression option *
-                    expression option * statement
+  | ForStatement of
+      statement option * expression option * expression option * statement
   | TryStatement of expression * return list * block * catch_clause list
   | Emit of expression * function_call_arguments
   | Return of expression option * (ident * expression) list
@@ -163,8 +178,9 @@ and raw_statement =
   | PlaceholderStatement
   | RepeatStatement of expression * statement (* freeton *)
   | ForRangeStatement of
-      (type_ * storage_location option * ident) option list *
-      expression * statement (* freeton *)
+      (type_ * storage_location option * ident) option list
+      * expression
+      * statement (* freeton *)
 
 and expression = raw_expression node
 
@@ -178,14 +194,12 @@ and raw_expression =
   | ArrayAccess of expression * expression option
   | ArraySlice of expression * expression option * expression option
   | TupleExpression of expression option list
-
   | PrefixExpression of unary_operator * expression
   | SuffixExpression of expression * unary_operator
   | CompareExpression of expression * compare_operator * expression
   | BinaryExpression of expression * binary_operator * expression
   | AssignExpression of expression * expression
   | AssignBinaryExpression of expression * binary_operator * expression
-
   | IfExpression of expression * expression * expression
   | FieldExpression of expression * ident
   | FunctionCallExpression of expression * function_call_arguments
@@ -199,8 +213,8 @@ and catch_clause = ident option * param list * block
 
 and variable_definition =
   | VarInfer of ident option list * expression
-  | VarType of (type_ * storage_location option * ident) option list *
-               expression option
+  | VarType of
+      (type_ * storage_location option * ident) option list * expression option
 
 and function_call_arguments =
   | ExpressionList of expression list
@@ -248,13 +262,14 @@ and number_unit =
   | Days
   | Weeks
   | Years
-  | Nanoton  (* freeton *)
+  | Nanoton (* freeton *)
   | Microton (* freeton *)
   | Milliton (* freeton *)
-  | Ton      (* freeton *)
-  | Kiloton  (* freeton *)
-  | Megaton  (* freeton *)
-  | Gigaton  (* freeton *)
+  | Ton (* freeton *)
+  | Kiloton (* freeton *)
+  | Megaton (* freeton *)
+  | Gigaton
+(* freeton *)
 
 and unary_operator =
   | UPlus
@@ -288,66 +303,93 @@ and compare_operator =
   | CLeq
   | CGeq
 
-
 let is_contract = function
   | Contract -> true
-  | Library | Interface -> false
+  | Library
+  | Interface ->
+    false
 
 let is_library = function
   | Library -> true
-  | Contract | Interface -> false
+  | Contract
+  | Interface ->
+    false
 
 let is_interface = function
   | Interface -> true
-  | Contract | Library -> false
-
+  | Contract
+  | Library ->
+    false
 
 let is_mutable = function
   | MMutable -> true
-  | MConstant | MImmutable -> false
+  | MConstant
+  | MImmutable ->
+    false
 
 let is_constant = function
   | MConstant -> true
-  | MMutable | MImmutable -> false
+  | MMutable
+  | MImmutable ->
+    false
 
 let is_immutable = function
   | MImmutable -> true
-  | MConstant | MMutable -> false
-
+  | MConstant
+  | MMutable ->
+    false
 
 let is_payable = function
   | MPayable -> true
-  | MNonPayable | MView | MPure -> false
+  | MNonPayable
+  | MView
+  | MPure ->
+    false
 
 let is_nonpayable = function
   | MNonPayable -> true
-  | MPayable | MView | MPure -> false
-
+  | MPayable
+  | MView
+  | MPure ->
+    false
 
 let is_external = function
   | VExternal -> true
-  | VInternal | VPublic | VPrivate -> false
+  | VInternal
+  | VPublic
+  | VPrivate ->
+    false
 
 let is_internal = function
   | VInternal -> true
-  | VExternal | VPublic | VPrivate -> false
+  | VExternal
+  | VPublic
+  | VPrivate ->
+    false
 
 let is_private = function
   | VPrivate -> true
-  | VExternal | VInternal | VPublic -> false
+  | VExternal
+  | VInternal
+  | VPublic ->
+    false
 
 let is_public = function
   | VPublic -> true
-  | VExternal | VInternal | VPrivate -> false
+  | VExternal
+  | VInternal
+  | VPrivate ->
+    false
 
 let is_inheritable = function
-  | VPublic | VExternal | VInternal -> true
+  | VPublic
+  | VExternal
+  | VInternal ->
+    true
   | VPrivate -> false
 
-
-
 let same_mutability m1 m2 =
-  match m1, m2 with
+  match (m1, m2) with
   | MPure, MPure -> true
   | MView, MView -> true
   | MPayable, MPayable -> true
@@ -356,7 +398,7 @@ let same_mutability m1 m2 =
 
 (* for the purpose of overriding *)
 let convertible_mutability ~from ~to_ =
-  match from, to_ with
+  match (from, to_) with
   | MNonPayable, (MView | MPure | MNonPayable) -> true
   | MNonPayable, MPayable -> false
   | MView, (MPure | MView) -> true
@@ -366,10 +408,8 @@ let convertible_mutability ~from ~to_ =
   | MPayable, MPayable -> true
   | MPayable, (MPure | MView | MNonPayable) -> false
 
-
-
 let same_visibility v1 v2 =
-  match v1, v2 with
+  match (v1, v2) with
   | VExternal, VExternal -> true
   | VInternal, VInternal -> true
   | VPublic, VPublic -> true
@@ -378,7 +418,7 @@ let same_visibility v1 v2 =
 
 (* for the purpose of overriding *)
 let convertible_visibility ~from ~to_ =
-  match from, to_ with
+  match (from, to_) with
   | VExternal, (VPublic | VExternal) -> true
   | VExternal, (VInternal | VPrivate) -> false
   | VPublic, VPublic -> true
@@ -388,104 +428,102 @@ let convertible_visibility ~from ~to_ =
   | VPrivate, VPrivate -> true
   | VPrivate, (VExternal | VPublic | VInternal) -> false
 
-
-
 let unit_factor unit =
   let z =
     match unit with
-    | Unit     -> Z.one
-    | Wei      -> Z.one
-    | Kwei     -> ExtZ._10_3
-    | Mwei     -> ExtZ._10_6
-    | Gwei     -> ExtZ._10_9
-    | Twei     -> ExtZ._10_12
-    | Pwei     -> ExtZ._10_15
-    | Ether    -> ExtZ._10_18
-    | Hours    -> ExtZ._3600
-    | Minutes  -> ExtZ._60
-    | Seconds  -> Z.one
-    | Days     -> ExtZ._24x3600
-    | Weeks    -> ExtZ._7x24x3600
-    | Years    -> ExtZ._365x24x3600
-    | Nanoton  -> Z.one
+    | Unit -> Z.one
+    | Wei -> Z.one
+    | Kwei -> ExtZ._10_3
+    | Mwei -> ExtZ._10_6
+    | Gwei -> ExtZ._10_9
+    | Twei -> ExtZ._10_12
+    | Pwei -> ExtZ._10_15
+    | Ether -> ExtZ._10_18
+    | Hours -> ExtZ._3600
+    | Minutes -> ExtZ._60
+    | Seconds -> Z.one
+    | Days -> ExtZ._24x3600
+    | Weeks -> ExtZ._7x24x3600
+    | Years -> ExtZ._365x24x3600
+    | Nanoton -> Z.one
     | Microton -> ExtZ._10_3
     | Milliton -> ExtZ._10_6
-    | Ton      -> ExtZ._10_9
-    | Kiloton  -> ExtZ._10_12
-    | Megaton  -> ExtZ._10_15
-    | Gigaton  -> ExtZ._10_18
+    | Ton -> ExtZ._10_9
+    | Kiloton -> ExtZ._10_12
+    | Megaton -> ExtZ._10_15
+    | Gigaton -> ExtZ._10_18
   in
   Q.of_bigint z
 
 let apply_unit q unit =
   match unit with
-  | Unit | Wei | Seconds -> q
+  | Unit
+  | Wei
+  | Seconds ->
+    q
   | _ -> Q.mul q (unit_factor unit)
 
 let apply_unop op q =
   match op with
-  | UPlus ->
-      Some (q)
-  | UMinus ->
-      Some (Q.neg q)
+  | UPlus -> Some q
+  | UMinus -> Some (Q.neg q)
   | UNot ->
-      if ExtQ.is_int q then
-        Some (Q.of_bigint (Z.lognot (Q.num q)))
-      else
-        None
-  | ULNot
-  | UInc | UDec
-  | UDelete ->
+    if ExtQ.is_int q then
+      Some (Q.of_bigint (Z.lognot (Q.num q)))
+    else
       None
+  | ULNot
+  | UInc
+  | UDec
+  | UDelete ->
+    None
 
 let apply_binop q1 op q2 =
   match op with
-  | BPlus ->
-      Some (Q.add q1 q2)
-  | BMinus ->
-      Some (Q.sub q1 q2)
-  | BTimes ->
-      Some (Q.mul q1 q2)
-  | BDiv ->
-      Some (Q.div q1 q2)
+  | BPlus -> Some (Q.add q1 q2)
+  | BMinus -> Some (Q.sub q1 q2)
+  | BTimes -> Some (Q.mul q1 q2)
+  | BDiv -> Some (Q.div q1 q2)
   | BMod ->
-(* TODO: Solidity allows this on fractions *)
-      if ExtQ.is_int q1 && ExtQ.is_int q2 then
-        Some (Q.of_bigint (snd (Z.ediv_rem (Q.num q1) (Q.num q2))))
-      else
-        None
-  | BExp ->
-      if ExtQ.is_int q2 then
-        let e = Z.to_int (Q.num q2) in (* Warning: may overflow *)
-        let n = Z.pow (Q.num q1) e in
-        let d = Z.pow (Q.den q1) e in
-        Some (Q.make n d)
-      else
-        None
-  | BAnd ->
-      if ExtQ.is_int q1 && ExtQ.is_int q2 then
-        Some (Q.of_bigint (Z.logand (Q.num q1) (Q.num q2)))
-      else
-        None
-  | BOr ->
-      if ExtQ.is_int q1 && ExtQ.is_int q2 then
-        Some (Q.of_bigint (Z.logor (Q.num q1) (Q.num q2)))
-      else
-        None
-  | BXor ->
-      if ExtQ.is_int q1 && ExtQ.is_int q2 then
-        Some (Q.of_bigint (Z.logxor (Q.num q1) (Q.num q2)))
-      else
-        None
-  | BLShift ->
-      if ExtQ.is_int q1 && ExtQ.is_int q2 && ExtQ.is_pos q2 then
-        Some (Q.of_bigint (Z.shift_left (Q.num q1) (Q.to_int q2)))
-      else
-        None
-  | BRShift ->
-      if ExtQ.is_int q1 && ExtQ.is_int q2 && ExtQ.is_pos q2 then
-        Some (Q.of_bigint (Z.shift_right (Q.num q1) (Q.to_int q2)))
-      else
-        None
-  | BLAnd | BLOr ->
+    (* TODO: Solidity allows this on fractions *)
+    if ExtQ.is_int q1 && ExtQ.is_int q2 then
+      Some (Q.of_bigint (snd (Z.ediv_rem (Q.num q1) (Q.num q2))))
+    else
       None
+  | BExp ->
+    if ExtQ.is_int q2 then
+      let e = Z.to_int (Q.num q2) in
+      (* Warning: may overflow *)
+      let n = Z.pow (Q.num q1) e in
+      let d = Z.pow (Q.den q1) e in
+      Some (Q.make n d)
+    else
+      None
+  | BAnd ->
+    if ExtQ.is_int q1 && ExtQ.is_int q2 then
+      Some (Q.of_bigint (Z.logand (Q.num q1) (Q.num q2)))
+    else
+      None
+  | BOr ->
+    if ExtQ.is_int q1 && ExtQ.is_int q2 then
+      Some (Q.of_bigint (Z.logor (Q.num q1) (Q.num q2)))
+    else
+      None
+  | BXor ->
+    if ExtQ.is_int q1 && ExtQ.is_int q2 then
+      Some (Q.of_bigint (Z.logxor (Q.num q1) (Q.num q2)))
+    else
+      None
+  | BLShift ->
+    if ExtQ.is_int q1 && ExtQ.is_int q2 && ExtQ.is_pos q2 then
+      Some (Q.of_bigint (Z.shift_left (Q.num q1) (Q.to_int q2)))
+    else
+      None
+  | BRShift ->
+    if ExtQ.is_int q1 && ExtQ.is_int q2 && ExtQ.is_pos q2 then
+      Some (Q.of_bigint (Z.shift_right (Q.num q1) (Q.to_int q2)))
+    else
+      None
+  | BLAnd
+  | BLOr ->
+    None

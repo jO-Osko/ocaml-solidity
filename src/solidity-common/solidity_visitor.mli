@@ -10,65 +10,95 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Visitors are objects providing utils for exhaustively passing through
-    the Solidity AST. *)
+(** Visitors are objects providing utils for exhaustively passing through the
+    Solidity AST. *)
 
 open Solidity_ast
 open Solidity_common
 
 (** The different kind of actions to perform after each visit *)
 type action =
-  | SkipChildren
-  (** Stops the visit of the current branch *)
-
-  | DoChildren
-  (** Visits the branch children *)
-
+  | SkipChildren  (** Stops the visit of the current branch *)
+  | DoChildren  (** Visits the branch children *)
   | DoChildrenPost of (unit -> unit)
-  (** Visits the branch children and, once the visit is finished,
-      calls the function *)
+      (** Visits the branch children and, once the visit is finished, calls the
+          function *)
 
-(** The AST visitor.
-    Each method is called when reaching an element of the corresponding type
-    in the AST. *)
+(** The AST visitor. Each method is called when reaching an element of the
+    corresponding type in the AST. *)
 class virtual ast_visitor :
   object
     method virtual visitBinaryOperator : binary_operator -> action
+
     method virtual visitBool : bool -> action
+
     method virtual visitChar : char -> action
+
     method virtual visitCompareOperator : compare_operator -> action
+
     method virtual visitContractDef : contract_definition -> action
+
     method virtual visitContractKind : contract_kind -> action
+
     method virtual visitContractPart : contract_part -> action
+
     method virtual visitElementaryType : elementary_type -> action
+
     method virtual visitEventDef : event_definition -> action
+
     method virtual visitExpression : expression -> action
+
     method virtual visitFunMutability : fun_mutability -> action
+
     method virtual visitFunctionCallArguments :
       function_call_arguments -> action
+
     method virtual visitFunctionDef : function_definition -> action
+
     method virtual visitFunctionType : function_type -> action
+
     method virtual visitIdent : Ident.t -> action
+
     method virtual visitImportDirective : import_directive -> action
+
     method virtual visitImportSymbols : import_symbols -> action
+
     method virtual visitInt : int -> action
+
     method virtual visitList : 'a list -> action
+
     method virtual visitLongIdent : 'kind LongIdent.t -> action
+
     method virtual visitModifierDef : modifier_definition -> action
+
     method virtual visitNode : 'a node -> action
+
     method virtual visitNumberUnit : number_unit -> action
+
     method virtual visitOption : 'a option -> action
+
     method virtual visitQ : Q.t -> action
+
     method virtual visitSourceUnit : source_unit -> action
+
     method virtual visitStateVariableDef : state_variable_definition -> action
+
     method virtual visitStatement : statement -> action
+
     method virtual visitStorageLocation : storage_location -> action
+
     method virtual visitString : string -> action
+
     method virtual visitType : type_ -> action
+
     method virtual visitTypeDef : type_definition -> action
+
     method virtual visitUnaryOperator : unary_operator -> action
+
     method virtual visitVarMutability : var_mutability -> action
+
     method virtual visitVariableDef : variable_definition -> action
+
     method virtual visitVisibility : visibility -> action
 
     (** If the visitor is visiting a node, returns its annotation. *)
@@ -79,57 +109,94 @@ class virtual ast_visitor :
 
     (* Do not use these methods. Todo: hide them *)
     method setAnnot : annot option -> unit
+
     method setPos : pos option -> unit
   end
 
-(** A dummy visitor. Visits the whole AST and does nothing.
-    You may inherit this visitor and redefine its methods to
-    avoid redefining all the methods. *)
+(** A dummy visitor. Visits the whole AST and does nothing. You may inherit this
+    visitor and redefine its methods to avoid redefining all the methods. *)
 class init_ast_visitor :
   object
-    method visitBinaryOperator        : binary_operator -> action
-    method visitBool                  : bool -> action
-    method visitChar                  : char -> action
-    method visitCompareOperator       : compare_operator -> action
-    method visitContractDef           : contract_definition -> action
-    method visitContractKind          : contract_kind -> action
-    method visitContractPart          : contract_part -> action
-    method visitElementaryType        : elementary_type -> action
-    method visitEventDef              : event_definition -> action
-    method visitExpression            : expression -> action
-    method visitFunMutability         : fun_mutability -> action
+    method visitBinaryOperator : binary_operator -> action
+
+    method visitBool : bool -> action
+
+    method visitChar : char -> action
+
+    method visitCompareOperator : compare_operator -> action
+
+    method visitContractDef : contract_definition -> action
+
+    method visitContractKind : contract_kind -> action
+
+    method visitContractPart : contract_part -> action
+
+    method visitElementaryType : elementary_type -> action
+
+    method visitEventDef : event_definition -> action
+
+    method visitExpression : expression -> action
+
+    method visitFunMutability : fun_mutability -> action
+
     method visitFunctionCallArguments : function_call_arguments -> action
-    method visitFunctionDef           : function_definition -> action
-    method visitFunctionType          : function_type -> action
-    method visitIdent                 : Ident.t -> action
-    method visitImportDirective       : import_directive -> action
-    method visitImportSymbols         : import_symbols -> action
-    method visitInt                   : int -> action
-    method visitList                  : 'a list -> action
-    method visitLongIdent             : 'kind LongIdent.t -> action
-    method visitModifierDef           : modifier_definition -> action
-    method visitNode                  : 'a node -> action
-    method visitNumberUnit            : number_unit -> action
-    method visitOption                : 'a option -> action
-    method visitQ                     : Q.t -> action
-    method visitSourceUnit            : source_unit -> action
-    method visitStateVariableDef      : state_variable_definition -> action
-    method visitStatement             : statement -> action
-    method visitStorageLocation       : storage_location -> action
-    method visitString                : string -> action
-    method visitType                  : type_ -> action
-    method visitTypeDef               : type_definition -> action
-    method visitUnaryOperator         : unary_operator -> action
-    method visitVarMutability         : var_mutability -> action
-    method visitVariableDef           : variable_definition -> action
-    method visitVisibility            : visibility -> action
+
+    method visitFunctionDef : function_definition -> action
+
+    method visitFunctionType : function_type -> action
+
+    method visitIdent : Ident.t -> action
+
+    method visitImportDirective : import_directive -> action
+
+    method visitImportSymbols : import_symbols -> action
+
+    method visitInt : int -> action
+
+    method visitList : 'a list -> action
+
+    method visitLongIdent : 'kind LongIdent.t -> action
+
+    method visitModifierDef : modifier_definition -> action
+
+    method visitNode : 'a node -> action
+
+    method visitNumberUnit : number_unit -> action
+
+    method visitOption : 'a option -> action
+
+    method visitQ : Q.t -> action
+
+    method visitSourceUnit : source_unit -> action
+
+    method visitStateVariableDef : state_variable_definition -> action
+
+    method visitStatement : statement -> action
+
+    method visitStorageLocation : storage_location -> action
+
+    method visitString : string -> action
+
+    method visitType : type_ -> action
+
+    method visitTypeDef : type_definition -> action
+
+    method visitUnaryOperator : unary_operator -> action
+
+    method visitVarMutability : var_mutability -> action
+
+    method visitVariableDef : variable_definition -> action
+
+    method visitVisibility : visibility -> action
 
     method getAnnot : unit -> annot option
-    method getPos   : unit -> pos option
+
+    method getPos : unit -> pos option
 
     (* Do not use these methods. Todo: hide them *)
     method setAnnot : annot option -> unit
-    method setPos   : pos option -> unit
+
+    method setPos : pos option -> unit
   end
 
 (** Functions visiting the AST. *)

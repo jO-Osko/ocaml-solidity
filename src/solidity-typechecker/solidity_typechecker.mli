@@ -10,25 +10,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Types a program and, if successful, returns the
-    annoted program where the program_modules are ordered wrt.
-    their dependencies. *)
+(** Types a program and, if successful, returns the annoted program where the
+    program_modules are ordered wrt. their dependencies. *)
 val type_program :
-  ?init:(unit -> unit) ->
-  Solidity_ast.program -> Solidity_ast.program
-
+  ?init:(unit -> unit) -> Solidity_ast.program -> Solidity_ast.program
 
 val expect_expression_type :
   Solidity_checker_TYPES.options ->
   Solidity_checker_TYPES.env ->
-  Solidity_ast.expression -> Solidity_checker_TYPES.type_ -> unit
+  Solidity_ast.expression ->
+  Solidity_checker_TYPES.type_ ->
+  unit
 
 val type_options_ref :
   (Solidity_checker_TYPES.options ->
-   Solidity_checker_TYPES.env ->
-   Solidity_common.pos ->
-   bool ->
-   Solidity_checker_TYPES.function_options ->
-   (Solidity_ast.ident * Solidity_ast.expression) list ->
-   Solidity_checker_TYPES.function_options)
-    ref
+  Solidity_checker_TYPES.env ->
+  Solidity_common.pos ->
+  bool ->
+  Solidity_checker_TYPES.function_options ->
+  (Solidity_ast.ident * Solidity_ast.expression) list ->
+  Solidity_checker_TYPES.function_options )
+  ref

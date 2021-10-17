@@ -13,15 +13,22 @@ val digest :
 
 module type HASH = sig
   type t
+
   val hash : string -> t
+
   val hash_bytes : bytes -> t (* typed *)
+
   val raw : t -> string
+
   val size : int
+
   val digest : string -> string (* untyped *)
-  end
+end
 
 module SHA256 : HASH
+
 module SHA3KEC : HASH
+
 module SHA3KEC512 : HASH
 
 (*

@@ -12,9 +12,11 @@
 
 val parse_file :
   ?freeton:bool ->
-  ?preprocess:( string -> string ) ->
+  ?preprocess:(string -> string) ->
   ?cpp:bool ->
-  string -> Solidity_ast.program
+  string ->
+  Solidity_ast.program
 
 val add_temporary_file : string -> unit
+
 val keep_temporary_files : unit -> unit

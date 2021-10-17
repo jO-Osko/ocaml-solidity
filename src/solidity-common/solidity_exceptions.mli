@@ -69,10 +69,12 @@ exception FunctionAlreadyDefined of Ident.t * pos
 exception ImmutableDefinedInInheritingContract of Ident.t * (Ident.t * pos)
 
 (** Raised when a non virtual function is overridden *)
-exception OverridingNonVirtual of
-  Ident.t * (* Fun name *)
-  pos * (* Pos of the override *)
-  pos (* Pos of the virtual *)
+exception
+  OverridingNonVirtual of
+    Ident.t * (* Fun name *)
+              pos * (* Pos of the override *)
+                    pos
+(* Pos of the virtual *)
 
 (** Raised when trying to override a function that does not exist *)
 exception UnexpectedOverride of Ident.t * pos
@@ -84,31 +86,44 @@ exception ExpectedOverride of Ident.t * pos
 (** Generic override error *)
 exception WrongOverride of Ident.t * pos * string * string
 
-(** Raised when there is a conflict between inherited virtual functions
-    and nothing overrides them. *)
-exception NoOverrideMultipleFunDefs of
-  IdentSet.t * (* the contracts inherited *)
-  Ident.t * (* the inheriting contract *)
-  Ident.t (* the function *)
+(** Raised when there is a conflict between inherited virtual functions and
+    nothing overrides them. *)
+exception
+  NoOverrideMultipleFunDefs of
+    IdentSet.t
+    * (* the contracts inherited *)
+      Ident.t
+    * (* the inheriting contract *)
+      Ident.t
+(* the function *)
 
 (** Raised when a pure function reads a global *)
-exception PureFunctionReadsGlobal of
+exception
+  PureFunctionReadsGlobal of
     Ident.t * (* The function *)
-    Ident.t * (* The global *)
-    pos (* The read position *)
+              Ident.t * (* The global *)
+                        pos
+(* The read position *)
 
 (** Raised when a pure/view function writes a global *)
-exception ForbiddenGlobalWrite of
+exception
+  ForbiddenGlobalWrite of
     Ident.t * (* The function *)
-    Ident.t * (* The global *)
-    pos (* The read position *)
+              Ident.t * (* The global *)
+                        pos
+(* The read position *)
 
-(** Raised when a function calls another one with
-    a less permissive mutability *)
-exception ForbiddenCall of
-    Ident.t * fun_mutability * (* Caller function & its purity *)
-    Ident.t * fun_mutability * (* Called function & its purity *)
-    pos (* Call position *)
+(** Raised when a function calls another one with a less permissive mutability *)
+exception
+  ForbiddenCall of
+    Ident.t
+    * fun_mutability
+    * (* Caller function & its purity *)
+      Ident.t
+    * fun_mutability
+    * (* Called function & its purity *)
+      pos
+(* Call position *)
 
 (** Raised when a read access is made in a pure function *)
 exception ForbiddenReadAccess of pos
@@ -117,21 +132,26 @@ exception ForbiddenReadAccess of pos
 exception ForbiddenWritState of pos
 
 (** Raised when there is a selector conflict between functions *)
-exception InconsistentVisibility of
-    Ident.t * (* Name of the function *)
-    string * (* Name of the selector *)
-    pos * (* Position of first definition *)
-    pos (* Position of second definition *)
+exception
+  InconsistentVisibility of
+    Ident.t
+    * (* Name of the function *)
+      string
+    * (* Name of the selector *)
+      pos
+    * (* Position of first definition *)
+      pos
+(* Position of second definition *)
 
 (** Raised when there is no placeholder in a modifier *)
-exception MissingPlaceholderStatement of
+exception
+  MissingPlaceholderStatement of
     Ident.t * (* Modifier name with an empty body *)
-    pos
+              pos
 
 (** Raised when a file global is not a constant *)
-exception FileGlobalNotConstant of
-    Ident.t * (* Global name *)
-    pos
+exception FileGlobalNotConstant of Ident.t * (* Global name *)
+                                             pos
 
 val invariant_broken : string -> 'a
 
