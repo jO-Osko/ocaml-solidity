@@ -26,16 +26,19 @@ let keep_temporary_files () = remove_temporary_files := false
 
 let add_temporary_file file = tmp_files := file :: !tmp_files
 
-let get_imported_files m =
+let get_imported_files file_locator m =
   let base = Filename.dirname m.module_file in
   List.fold_left
     (fun fileset unit_node ->
       match strip unit_node with
       | Import { import_from; import_pos; _ } ->
-        let file = make_absolute_path base import_from in
-        if not (Sys.file_exists file) then
+        let file = file_locator (Some base) import_from in
+        let file = make_absolute_path base file in
+        if not (Sys.file_exists file) then (
+          Printf.printf "Opening %s" file;
           raise
-            (Solidity_exceptions.SyntaxError ("File does not exist", import_pos));
+            (Solidity_exceptions.SyntaxError ("File does not exist", import_pos))
+        );
         StringSet.add file fileset
       | _ -> fileset )
     StringSet.empty m.module_units
@@ -90,11 +93,17 @@ let parse_module id ?(cpp = false) ?preprocess file =
    imported files are added at the end of the input file queue.
    The imports of a file are ordered lexicographically
    before being added to the queue. *)
-let parse_file ?(freeton = false) ?preprocess ?cpp filename =
+let parse_file ?(freeton = false) ?preprocess ?file_locator ?cpp filename =
   Solidity_lexer.init ~freeton;
   Solidity_common.for_freeton := freeton;
 
-  let file = make_absolute_path (Sys.getcwd ()) filename in
+  let file_locator =
+    match file_locator with
+    | None -> fun _ fname -> fname
+    | Some f -> f
+  in
+
+  let file = file_locator None (make_absolute_path (Sys.getcwd ()) filename) in
 
   let files = ref (StringSet.singleton file) in
 
@@ -113,7 +122,7 @@ let parse_file ?(freeton = false) ?preprocess ?cpp filename =
         ?preprocess ?cpp file
     in
     modules := m :: !modules;
-    let imported_files = get_imported_files m in
+    let imported_files = get_imported_files file_locator m in
     let new_files = StringSet.diff imported_files !files in
     files := StringSet.union new_files !files;
     StringSet.iter (fun file -> Queue.push file to_parse) new_files
