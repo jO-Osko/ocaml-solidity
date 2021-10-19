@@ -270,7 +270,11 @@ val set_annot : 'a node -> annot -> unit
 
 val replace_annot : 'a node -> annot -> unit
 
-val make_absolute_path : string -> string -> string
+val starts_with : prefix:string -> string -> bool
+
+val is_web_resource : string -> bool
+
+val make_absolute_path : ?allow_web:bool -> string -> string -> string
 
 val is_some : 'a option -> bool
 

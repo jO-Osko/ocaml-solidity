@@ -26,16 +26,18 @@ let keep_temporary_files () = remove_temporary_files := false
 
 let add_temporary_file file = tmp_files := file :: !tmp_files
 
-let get_imported_files file_locator m =
+let get_imported_files ?(allow_web = true) file_locator m =
   let base = Filename.dirname m.module_file in
   List.fold_left
     (fun fileset unit_node ->
       match strip unit_node with
       | Import { import_from; import_pos; _ } ->
         let file = file_locator (Some base) import_from in
-        let file = make_absolute_path base file in
-        if not (Sys.file_exists file) then (
-          Printf.printf "Opening %s" file;
+        let file = make_absolute_path ~allow_web base file in
+        if
+          (not (allow_web && Solidity_common.is_web_resource file))
+          && not (Sys.file_exists file)
+        then (
           raise
             (Solidity_exceptions.SyntaxError ("File does not exist", import_pos))
         );
@@ -49,7 +51,7 @@ let set_filename lexbuf filename =
   let lex_curr_p = lexbuf.lex_curr_p in
   lexbuf.lex_curr_p <- { lex_curr_p with pos_fname = filename }
 
-let parse_module id ?(cpp = false) ?preprocess file =
+let parse_module id ?(cpp = false) ?preprocess file_reader file =
   let content =
     let cpp =
       cpp
@@ -64,11 +66,11 @@ let parse_module id ?(cpp = false) ?preprocess file =
       let res = Sys.command cmd in
       if res = 0 then begin
         add_temporary_file tmp_file;
-        EzFile.read_file tmp_file
+        file_reader tmp_file
       end else
         Printf.kprintf failwith "Warning: %s failed with error %d\n%!" cmd res
     else
-      EzFile.read_file file
+      file_reader file
   in
   let content =
     match preprocess with
@@ -93,16 +95,20 @@ let parse_module id ?(cpp = false) ?preprocess file =
    imported files are added at the end of the input file queue.
    The imports of a file are ordered lexicographically
    before being added to the queue. *)
-let parse_file ?(freeton = false) ?preprocess ?file_locator ?cpp filename =
+let parse_file ?(freeton = false) ?preprocess ?file_locator ?file_reader
+    ?(allow_web = true) ?cpp filename =
   Solidity_lexer.init ~freeton;
   Solidity_common.for_freeton := freeton;
-
   let file_locator =
     match file_locator with
     | None -> fun _ fname -> fname
     | Some f -> f
   in
-
+  let file_reader =
+    match file_reader with
+    | None -> EzFile.read_file
+    | Some fr -> fr
+  in
   let file = file_locator None (make_absolute_path (Sys.getcwd ()) filename) in
 
   let files = ref (StringSet.singleton file) in
@@ -119,10 +125,10 @@ let parse_file ?(freeton = false) ?preprocess ?file_locator ?cpp filename =
       parse_module
         ( id := !id + 1;
           !id )
-        ?preprocess ?cpp file
+        ?preprocess ?cpp file_reader file
     in
     modules := m :: !modules;
-    let imported_files = get_imported_files file_locator m in
+    let imported_files = get_imported_files ~allow_web file_locator m in
     let new_files = StringSet.diff imported_files !files in
     files := StringSet.union new_files !files;
     StringSet.iter (fun file -> Queue.push file to_parse) new_files

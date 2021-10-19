@@ -14,6 +14,8 @@ val parse_file :
   ?freeton:bool ->
   ?preprocess:(string -> string) ->
   ?file_locator:(string option -> string -> string) ->
+  ?file_reader:(string -> string) ->
+  ?allow_web:bool ->
   ?cpp:bool ->
   string ->
   Solidity_ast.program

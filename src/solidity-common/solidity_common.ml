@@ -512,13 +512,36 @@ let replace_annot n annot =
     error "%sNode annotation not set at %s" source loc
   | _ -> n.annot <- annot
 
-let make_absolute_path base path =
-  FilePath.reduce ~no_symlink:true
-  @@
-  if FilePath.is_relative path then
-    FilePath.make_absolute base path
-  else
+(* String utils *)
+
+let starts_with ~prefix s =
+  let len_s = String.length s
+  and len_pre = String.length prefix in
+  let rec aux i =
+    if i = len_pre then
+      true
+    else if String.unsafe_get s i <> String.unsafe_get prefix i then
+      false
+    else
+      aux (i + 1)
+  in
+  len_s >= len_pre && aux 0
+
+let web_prefix = [ "http://"; "https://"; "ftp://" ]
+
+let is_web_resource s =
+  List.exists (fun prefix -> starts_with ~prefix s) web_prefix
+
+let make_absolute_path ?(allow_web = true) base path =
+  if allow_web && is_web_resource path then
     path
+  else
+    FilePath.reduce ~no_symlink:true
+    @@
+    if FilePath.is_relative path then
+      FilePath.make_absolute base path
+    else
+      path
 
 let is_some = function
   | Some _ -> true
