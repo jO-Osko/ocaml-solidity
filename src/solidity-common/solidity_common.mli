@@ -1,5 +1,7 @@
 (**************************************************************************)
 (*                                                                        *)
+(*  Copyright Filip Koprivec                                              *)
+(*  Changes on 21.10.2021                                                 *)
 (*  Copyright (c) 2021 OCamlPro & Origin Labs                             *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)

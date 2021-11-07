@@ -1,5 +1,8 @@
 (**************************************************************************)
 (*                                                                        *)
+(*  Copyright Filip Koprivec                                              *)
+(*  Changes on 17.10.2021, 21.10.2021                                     *)
+(*                                                                        *)
 (*  Copyright (c) 2021 OCamlPro & Origin Labs                             *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)
@@ -38,6 +41,7 @@ let get_imported_files ?(allow_web = true) file_locator m =
           (not (allow_web && Solidity_common.is_web_resource file))
           && not (Sys.file_exists file)
         then (
+          Printf.printf "File %s does not exist\n" file;
           raise
             (Solidity_exceptions.SyntaxError ("File does not exist", import_pos))
         );
@@ -82,6 +86,7 @@ let parse_module id ?(cpp = false) ?preprocess file_reader file =
   let module_units =
     try Solidity_raw_parser.module_units Solidity_lexer.token lb with
     | Solidity_raw_parser.Error ->
+      Printf.printf "FNAME: %s" file;
       raise
         (Solidity_exceptions.SyntaxError
            ( "Parse error",
