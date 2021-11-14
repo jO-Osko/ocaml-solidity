@@ -2,7 +2,7 @@
 (**************************************************************************)
 (*                                                                        *)
 (*  Copyright Filip Koprivec                                              *)
-(*  Changes on 17.10.2021                                                 *)
+(*  Changes on 17.10.2021, 14.11.2021                                     *)
 (*                                                                        *)
 (*  Copyright (c) 2021 OCamlPro & Origin Labs                             *)
 (*                                                                        *)
@@ -892,7 +892,7 @@ statement_before_semi:
 // Very hacky way to get around the fact that the original parser
 // doesn't support assembly statements.
 assembler:
-  | ASSEMBLY LBRACE assembler_code RBRACE
+  | ASSEMBLY LBRACE list(assembler_code) RBRACE // Very hacky
       { InlineAssembly "Not parsed" }
 
 ;;
